@@ -17,4 +17,4 @@ This Exercise is a simple CRUD (Create, Read, Update, Delete) API for managing a
 - FastAPI
 - Alembic
 - Pydantic
-- SQLite
+- SQL-Alchemy
