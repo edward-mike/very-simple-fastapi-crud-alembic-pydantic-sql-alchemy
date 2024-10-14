@@ -15,6 +15,26 @@ class Article(Model):
 
 #  Pydantic/Schema  #
 #############
-# title: str
-# body: str
-# is_published: Optional[bool] = False
+# title
+# body
+# is_published
+
+
+################################################
+
+
+class User(Model):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String)
+    email = Column(String)
+    password = Column(String)
+    is_valid = Column(Boolean, default=False, nullable=True)
+
+
+#  Pydantic/Schema
+#     username: str
+#     email: str
+#     password: str
+#     is_valid: Optional[bool] = False

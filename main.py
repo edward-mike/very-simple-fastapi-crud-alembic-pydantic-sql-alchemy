@@ -1,12 +1,15 @@
 from typing import Dict, List
 
 from fastapi import Depends, FastAPI, HTTPException, Response, status
+from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from src import models, schema
 from src.db_connection import get_db_session
 
 app = FastAPI()
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 # 1. General Welcome Route
@@ -17,7 +20,7 @@ def welcome_api() -> Dict[str, str]:
 
 
 # 2. Create Article
-@app.post("/create-article", status_code=status.HTTP_201_CREATED)
+@app.post("/create-article", status_code=status.HTTP_201_CREATED, tags=["article"])
 def create_article(
     article: schema.Article, session: Session = Depends(get_db_session)
 ) -> schema.Article:
@@ -30,7 +33,12 @@ def create_article(
 
 
 # 3. Get All Articles
-@app.get("/articles/", status_code=status.HTTP_200_OK)
+@app.get(
+    "/articles/",
+    status_code=status.HTTP_200_OK,
+    response_model=List[schema.ArticlePublic],
+    tags=["article"],
+)
 def articles(
     response: Response, session: Session = Depends(get_db_session)
 ) -> List[schema.Article]:
@@ -43,7 +51,12 @@ def articles(
 
 
 # 4. Get a Single Article by ID
-@app.get("/article/{id}", status_code=status.HTTP_200_OK)
+@app.get(
+    "/article/{id}",
+    status_code=status.HTTP_200_OK,
+    response_model=schema.ArticlePublic,
+    tags=["article"],
+)
 def article(
     id: int, response: Response, session: Session = Depends(get_db_session)
 ) -> schema.Article:
@@ -58,11 +71,12 @@ def article(
 
 
 # 5. Update an Article by ID
-@app.put("/article/edit/{id}", status_code=status.HTTP_202_ACCEPTED)
+@app.put("/article/edit/{id}", status_code=status.HTTP_202_ACCEPTED, tags=["article"])
 def article_update(
     id: int, article: schema.Article, session: Session = Depends(get_db_session)
 ) -> str:
     """Handler for updating an article by ID"""
+
     article_db = session.query(models.Article).filter(models.Article.id == id).first()
     if not article_db:
         raise HTTPException(
@@ -78,7 +92,9 @@ def article_update(
 
 
 # 6. Delete an Article by ID
-@app.delete("/article/delete/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@app.delete(
+    "/article/delete/{id}", status_code=status.HTTP_204_NO_CONTENT, tags=["article"]
+)
 def article_delete(
     id: int, response: Response, session: Session = Depends(get_db_session)
 ) -> None:
@@ -91,3 +107,40 @@ def article_delete(
         )
     session.delete(article)
     session.commit()
+
+
+########################################################################################
+
+
+# Create User
+@app.post("/create-user", status_code=status.HTTP_201_CREATED, tags=["user"])
+def create_user(
+    user: schema.User, session: Session = Depends(get_db_session)
+) -> schema.User:
+    hashed_password = pwd_context.hash(user.password)
+
+    user = models.User(
+        username=user.username, email=user.email, password=hashed_password
+    )
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    return user
+
+
+# Get All Users
+@app.get(
+    "/users/",
+    status_code=status.HTTP_200_OK,
+    response_model=List[schema.UserPublic],
+    tags=["user"],
+)
+def users(
+    response: Response, session: Session = Depends(get_db_session)
+) -> List[schema.User]:
+    """Handler for retrieving all users"""
+    users = session.query(models.User).all()
+    if not users:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return {"message": "Users not found"}
+    return users

@@ -41,12 +41,11 @@ This guide outlines common Alembic commands for managing database migrations.
     ```bash
     alembic -n engine1 revision --autogenerate -m "Your migration message"
     ```
-
     This command generates a migration script with a named target database (`engine1`).
 
 - **Upgrade to the latest migration with named target database:**
     ```bash
-    alembic -n engine1 upgrade head
+    alembic -n development_db upgrade head
     ```
 
     This command applies all migrations up to the latest version (`head`) with a named target database (`engine1`).
