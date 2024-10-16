@@ -5,9 +5,12 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from src import models, schema
-from src.db_connection import get_db_session
+from src.db_connection import Model, engine, get_db_session
 
 app = FastAPI()
+
+
+Model.metadata.create_all(engine)
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -36,7 +39,7 @@ def create_article(
 @app.get(
     "/articles/",
     status_code=status.HTTP_200_OK,
-    response_model=List[schema.ArticlePublic],
+    response_model=List[schema.ArticleResponse],
     tags=["article"],
 )
 def articles(
@@ -54,7 +57,7 @@ def articles(
 @app.get(
     "/article/{id}",
     status_code=status.HTTP_200_OK,
-    response_model=schema.ArticlePublic,
+    response_model=schema.ArticleResponse,
     tags=["article"],
 )
 def article(
@@ -132,7 +135,7 @@ def create_user(
 @app.get(
     "/users/",
     status_code=status.HTTP_200_OK,
-    response_model=List[schema.UserPublic],
+    response_model=List[schema.UserResponse],
     tags=["user"],
 )
 def users(

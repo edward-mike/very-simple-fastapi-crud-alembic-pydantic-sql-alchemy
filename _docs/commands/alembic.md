@@ -45,7 +45,7 @@ This guide outlines common Alembic commands for managing database migrations.
 
 - **Upgrade to the latest migration with named target database:**
     ```bash
-    alembic -n development_db upgrade head
+    alembic -n engine1 upgrade head
     ```
 
     This command applies all migrations up to the latest version (`head`) with a named target database (`engine1`).

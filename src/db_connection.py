@@ -34,14 +34,14 @@ SessionLocal = sessionmaker(
 )
 
 
-Model = declarative_base()
-
-Model.metadata.create_all(engine)
-
-
 def get_db_session() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
+
+Model = declarative_base()
+
+# Model.metadata.create_all(engine)

@@ -11,14 +11,12 @@ class Article(BaseModel):
 
 
 # Public Exposure Schema
-class ArticlePublic(BaseModel):
+class ArticleResponse(Article):
     """
     Show only article title, body and likes - dont display is_published
     """
 
-    title: str
-    body: str
-    likes: Optional[int] = 0
+    id: int
 
     class Config:
         from_attributes = True
@@ -34,7 +32,7 @@ class User(BaseModel):
     is_valid: Optional[bool] = False
 
 
-class UserPublic(BaseModel):
+class UserResponse(BaseModel):
     """
     Show only user username, email - don't display password
     """
